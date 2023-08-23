@@ -8,26 +8,22 @@
 import { onAuthStateChanged, signOut } from 'firebase/auth';
 import { auth } from './src/firebase';
 import React, { useState } from 'react';
-import type {PropsWithChildren} from 'react';
 import {
   SafeAreaView,
   Button,
-  View,
-  TextInput,
-  StatusBar,
   StyleSheet,
-  FlatList,
 } from 'react-native';
 
-import Home from './Home';
 import LoginScreen from './src/login/LoginScreen';
-
-type SectionProps = PropsWithChildren<{
-  title: string;
-}>;
+import Schedule from './Schedule';
+import Signup from './src/login/Signup';
+import ResetPassword from './src/login/ResetPassword';
 
 
 function App(): JSX.Element {
+
+const SIGNUP = 'signup';
+const RESETPASSWORD = 'reset-password';
 
 interface Card {
   id: number,
@@ -88,11 +84,10 @@ const DATA: Card[] = [
     month: 'May',
   },
 ];
-  const [searchText, setSearchText] = useState('');
-  const [filteredData, setFilteredData] = useState(DATA);
-
   const [loggedIn, setLoggedIn] = useState(false);
   const [screen, setScreen] = useState(null);
+
+  const callbackSetScreen = (screenName: any) => setScreen(screenName);
 
   onAuthStateChanged(auth, (user) => {
     if (user) {
@@ -101,12 +96,6 @@ const DATA: Card[] = [
       setLoggedIn(false);
     }
   });
-  // const logout = async () => {
-  //   try {
-  //     await signOut(auth);
-  //   } catch (e) {
-  //     console.error(e);
-  //   }
 
 const logout = async () => {
     console.log("Logout");
@@ -116,54 +105,24 @@ const logout = async () => {
           console.error(e);
         }
   }
+
+  console.log("Screen:", screen);
 const getScreen = () => {
     if (loggedIn) {
       return (
-          <View>
-            <StatusBar />
-            <Button title="Log out" onPress={logout} />
-
-            <TextInput
-              style={styles.searchInput}
-              placeholder="Search..."
-              value={searchText}
-              onChangeText={handleSearch}
-            />
-            <FlatList
-              data={filteredData}
-              renderItem={renderItem}
-              keyExtractor={(item) => item.id.toString()}
-            />
-            </View>
+          <Schedule DATA={DATA} setScreen={callbackSetScreen} />
       )
      };
-    // if (screen === 'signup') {} return <Signup setScreen={setScreen} />;
-    // if (screen === 'reset-password') return <ResetPassword setScreen={setScreen} />;
-    return (
-        <View>
-          <StatusBar />
-          <LoginScreen />
-        </View>
-    );
+    if (screen === SIGNUP) return <Signup setScreen={callbackSetScreen} />;
+    if (screen === RESETPASSWORD) return <ResetPassword setScreen={callbackSetScreen} />;
+      return (
+          <LoginScreen setScreen={callbackSetScreen}/>
+      );
   };
 
-  const handleSearch = (text: string) => {
-    setSearchText(text);
-
-    const filtered = DATA.filter(
-      (item) =>
-        item.day.toLowerCase().includes(text.toLowerCase()) ||
-        item.month.toLowerCase().includes(text.toLowerCase()) ||
-        item.callType.toLowerCase().includes(text.toLowerCase())
-    );
-
-    setFilteredData(filtered);
-  };
-const renderItem = ({ item }: { item: Card }) => (
-  <Home time={item.time} callType={item.callType} day={item.day} month={item.month} />
-);
   return (
           <SafeAreaView style={styles.safeArea}>
+            <Button title="Log out" onPress={logout} />
             {getScreen()}
           </SafeAreaView>
   );
