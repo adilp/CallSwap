@@ -11,15 +11,6 @@ const LoginScreen: React.FC<{}> = () => {
     await signInWithEmailAndPassword(auth, email, password)
     .then(userCredentials => console.log("User loggedin: ", userCredentials.user))
     .catch(error => console.log('Login error: ', error));
-    
-    // firebase.auth()
-    //   .signInWithEmailAndPassword(email, password)
-    //   .then(userCredential => {
-    //     console.log('User logged in:', userCredential.user);
-    //   })
-    //   .catch(error => {
-    //     console.error('Login error:', error);
-    //   });
   };
 
   return (
@@ -45,7 +36,7 @@ const LoginScreen: React.FC<{}> = () => {
 
 const styles = StyleSheet.create({
   container: {
-    flex: 1,
+    marginTop: 50,
     justifyContent: 'center',
     alignItems: 'center',
   },

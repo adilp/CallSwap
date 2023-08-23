@@ -5,10 +5,14 @@
  * @format
  */
 
+import { onAuthStateChanged, signOut } from 'firebase/auth';
+import { auth } from './src/firebase';
 import React, { useState } from 'react';
 import type {PropsWithChildren} from 'react';
 import {
   SafeAreaView,
+  Button,
+  View,
   TextInput,
   StatusBar,
   StyleSheet,
@@ -86,17 +90,62 @@ const DATA: Card[] = [
 ];
   const [searchText, setSearchText] = useState('');
   const [filteredData, setFilteredData] = useState(DATA);
-  // <TextInput
-  // style={styles.searchInput}
-  // placeholder="Search..."
-  // value={searchText}
-  // onChangeText={handleSearch}
-  // />
-  // <FlatList
-  // data={filteredData}
-  // renderItem={renderItem}
-  // keyExtractor={(item) => item.id.toString()}
-  // />
+
+  const [loggedIn, setLoggedIn] = useState(false);
+  const [screen, setScreen] = useState(null);
+
+  onAuthStateChanged(auth, (user) => {
+    if (user) {
+      setLoggedIn(true);
+    } else {
+      setLoggedIn(false);
+    }
+  });
+  // const logout = async () => {
+  //   try {
+  //     await signOut(auth);
+  //   } catch (e) {
+  //     console.error(e);
+  //   }
+
+const logout = async () => {
+    console.log("Logout");
+    try {
+        await signOut(auth);
+      } catch (e) {
+          console.error(e);
+        }
+  }
+const getScreen = () => {
+    if (loggedIn) {
+      return (
+          <View>
+            <StatusBar />
+            <Button title="Log out" onPress={logout} />
+
+            <TextInput
+              style={styles.searchInput}
+              placeholder="Search..."
+              value={searchText}
+              onChangeText={handleSearch}
+            />
+            <FlatList
+              data={filteredData}
+              renderItem={renderItem}
+              keyExtractor={(item) => item.id.toString()}
+            />
+            </View>
+      )
+     };
+    // if (screen === 'signup') {} return <Signup setScreen={setScreen} />;
+    // if (screen === 'reset-password') return <ResetPassword setScreen={setScreen} />;
+    return (
+        <View>
+          <StatusBar />
+          <LoginScreen />
+        </View>
+    );
+  };
 
   const handleSearch = (text: string) => {
     setSearchText(text);
@@ -114,13 +163,9 @@ const renderItem = ({ item }: { item: Card }) => (
   <Home time={item.time} callType={item.callType} day={item.day} month={item.month} />
 );
   return (
-    <SafeAreaView style={styles.safeArea}>
-      <StatusBar
-        // barStyle={isDarkMode ? 'light-content' : 'dark-content'}
-        // backgroundColor={backgroundStyle.backgroundColor}
-      />
-      <LoginScreen />
-    </SafeAreaView>
+          <SafeAreaView style={styles.safeArea}>
+            {getScreen()}
+          </SafeAreaView>
   );
 }
 
