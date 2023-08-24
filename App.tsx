@@ -87,7 +87,7 @@ const DATA: Card[] = [
   const [loggedIn, setLoggedIn] = useState(false);
   const [screen, setScreen] = useState(null);
 
-  const callbackSetScreen = (screenName: any) => setScreen(screenName);
+  const callbackSetScreen = (screenName: React.SetStateAction<null>) => setScreen(screenName);
 
   onAuthStateChanged(auth, (user) => {
     if (user) {
