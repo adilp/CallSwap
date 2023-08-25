@@ -10,6 +10,7 @@ import {
 
 import { auth } from '../firebase';
 import styles from './Style';
+import { SCREEN } from '../../App'
 
 export type Props = {
   setScreen: any;
@@ -41,7 +42,7 @@ const ResetPassword: React.FC<Props> = ({setScreen}) => {
 
         {error && <Text style={styles.error}>{error}</Text>}
 
-        <TouchableOpacity onPress={() => setScreen('login')}>
+        <TouchableOpacity onPress={() => setScreen(SCREEN.LOGIN)}>
           <Text style={styles.link}>Back to login</Text>
         </TouchableOpacity>
 

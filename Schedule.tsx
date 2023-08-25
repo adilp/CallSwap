@@ -1,57 +1,61 @@
-import React, { useState } from 'react';
-import {
-  FlatList,
-  StyleSheet,
-  TextInput,
-  View,
-  StatusBar
-  } from 'react-native';
+import React, {useState, useEffect} from 'react'
+import {FlatList, StyleSheet, TextInput, View, StatusBar} from 'react-native'
 import Home from './Home'
+import type { Card } from './App'
 
 export type Props = {
-  DATA: any;
-  setScreen: any;
-};
+  DATA: any
+  setScreen: any
+}
 
 const Schedule: React.FC<Props> = ({DATA, setScreen}) => {
   const handleSearch = (text: string) => {
-    setSearchText(text);
+    setSearchText(text)
 
     const filtered = DATA.filter(
       (item: any) =>
         item.day.toLowerCase().includes(text.toLowerCase()) ||
         item.month.toLowerCase().includes(text.toLowerCase()) ||
-        item.callType.toLowerCase().includes(text.toLowerCase())
-    );
+        item.callType.toLowerCase().includes(text.toLowerCase()),
+    )
 
-    setFilteredData(filtered);
-  };
+    setFilteredData(filtered)
+  }
 
-  setScreen('Home');
-  const [searchText, setSearchText] = useState('');
-  const [filteredData, setFilteredData] = useState(DATA);
+  useEffect(() => {
+    setScreen('Home')
+  }, [])
 
-  const renderItem = ({ item }: { item: any }) => (
-    <Home time={item.time} callType={item.callType} day={item.day} month={item.month} />
-  );
+  const [searchText, setSearchText] = useState('')
+  const [filteredData, setFilteredData] = useState(DATA)
+
+  const renderItem = ({item}: {item: Card}) => (
+    <Home
+      time={item.time}
+      callType={item.callType}
+      day={item.day}
+      month={item.month}
+      id={item.id}
+    />
+  )
   return (
-          <View>
-            <StatusBar />
+    <View>
+      <StatusBar />
 
-            <TextInput
-              style={styles.searchInput}
-              placeholder="Search..."
-              value={searchText}
-              onChangeText={handleSearch}
-            />
-            <FlatList
-              data={filteredData}
-              renderItem={renderItem}
-              keyExtractor={(item) => item.id.toString()}
-            />
-            </View>
-  );
-};
+      <TextInput
+        style={styles.searchInput}
+        placeholder='Search...'
+        value={searchText}
+        onChangeText={handleSearch}
+      />
+      <FlatList
+        data={filteredData}
+        renderItem={renderItem}
+        keyExtractor={item => item.id.toString()}
+      />
+    </View>
+  )
+}
 
 const styles = StyleSheet.create({
   safeArea: {
@@ -85,10 +89,6 @@ const styles = StyleSheet.create({
     paddingHorizontal: 12,
     marginBottom: 16,
   },
-});
+})
 
-export default Schedule;
-
-
-
-
+export default Schedule

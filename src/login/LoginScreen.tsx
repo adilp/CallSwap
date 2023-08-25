@@ -3,6 +3,7 @@ import React, {useState} from 'react'
 import {View, Text, TextInput, Button, TouchableOpacity} from 'react-native'
 import {auth} from '../firebase'
 import styles from './Style'
+import { SCREEN } from '../../App'
 
 export type Props = {
   setScreen: any
@@ -37,7 +38,7 @@ const LoginScreen: React.FC<Props> = ({setScreen}) => {
 
         {error && <Text style={styles.error}>{error}</Text>}
 
-        <TouchableOpacity onPress={() => setScreen('signup')}>
+        <TouchableOpacity onPress={() => setScreen(SCREEN.SIGNUP)}>
           <Text style={styles.link}>Create an account</Text>
         </TouchableOpacity>
 
@@ -60,7 +61,7 @@ const LoginScreen: React.FC<Props> = ({setScreen}) => {
           style={styles.input}
         />
 
-        <TouchableOpacity onPress={() => setScreen('reset-password')}>
+        <TouchableOpacity onPress={() => setScreen(SCREEN.RESETPASSWORD)}>
           <Text style={[styles.link, {color: '#333'}]}>
             I've forgotten my password
           </Text>

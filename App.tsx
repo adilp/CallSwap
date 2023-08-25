@@ -5,127 +5,122 @@
  * @format
  */
 
-import { onAuthStateChanged, signOut } from 'firebase/auth';
-import { auth } from './src/firebase';
-import React, { useState } from 'react';
-import {
-  SafeAreaView,
-  Button,
-  StyleSheet,
-} from 'react-native';
+import {onAuthStateChanged, signOut} from 'firebase/auth'
+import {auth} from './src/firebase'
+import React, {useState} from 'react'
+import {SafeAreaView, Button, StyleSheet} from 'react-native'
 
-import LoginScreen from './src/login/LoginScreen';
-import Schedule from './Schedule';
-import Signup from './src/login/Signup';
-import ResetPassword from './src/login/ResetPassword';
+import LoginScreen from './src/login/LoginScreen'
+import Schedule from './Schedule'
+import Signup from './src/login/Signup'
+import ResetPassword from './src/login/ResetPassword'
 
-
-function App(): JSX.Element {
-
-const SIGNUP = 'signup';
-const RESETPASSWORD = 'reset-password';
-
-interface Card {
-  id: number,
-  time: string;
-  callType: string;
-  day: string;
-  month: string;
+export interface Card {
+  id: number
+  time: string
+  callType: string
+  day: string
+  month: string
 }
 
-const DATA: Card[] = [
-  {
-    id: 1,
-    time: "10:00pm - 7:00am",
-    callType: 'Short Call',
-    day: '18',
-    month: 'January',
-  },
-  {
-    id: 2,
-    time: "08:00pm - 2:00am",
-    callType: 'Weekend Call',
-    day: '10',
-    month: 'Febrary',
-  },
-  {
-    id: 3,
-    time: "07:30pm - 1:30am",
-    callType: 'Short Call',
-    day: '12',
-    month: 'Febrary',
-  },
-  {
-    id: 4,
-    time: "04:00pm - 3:00am",
-    callType: 'Weekend Call',
-    day: '28',
-    month: 'March',
-  },
-  {
-    id: 5,
-    time: "12:00pm - 2:00pm",
-    callType: 'Regular Call',
-    day: '13',
-    month: 'April',
-  },
-  {
-    id: 6,
-    time: "04:00pm - 3:00am",
-    callType: 'Weekend Call',
-    day: '18',
-    month: 'May',
-  },
-  {
-    id: 7,
-    time: "12:00pm - 2:00pm",
-    callType: 'Regular Call',
-    day: '30',
-    month: 'May',
-  },
-];
-  const [loggedIn, setLoggedIn] = useState(false);
-  const [screen, setScreen] = useState(null);
+export enum SCREEN {
+  LOGIN = 'login',
+  SIGNUP = 'signup',
+  RESETPASSWORD = 'reset-password',
+}
 
-  const callbackSetScreen = (screenName: React.SetStateAction<null>) => setScreen(screenName);
+function App(): JSX.Element {
+  const DATA: Card[] = [
+    {
+      id: 1,
+      time: '10:00pm - 7:00am',
+      callType: 'Short Call',
+      day: '18',
+      month: 'January',
+    },
+    {
+      id: 2,
+      time: '08:00pm - 2:00am',
+      callType: 'Weekend Call',
+      day: '10',
+      month: 'Febrary',
+    },
+    {
+      id: 3,
+      time: '07:30pm - 1:30am',
+      callType: 'Short Call',
+      day: '12',
+      month: 'Febrary',
+    },
+    {
+      id: 4,
+      time: '04:00pm - 3:00am',
+      callType: 'Weekend Call',
+      day: '28',
+      month: 'March',
+    },
+    {
+      id: 5,
+      time: '12:00pm - 2:00pm',
+      callType: 'Regular Call',
+      day: '13',
+      month: 'April',
+    },
+    {
+      id: 6,
+      time: '04:00pm - 3:00am',
+      callType: 'Weekend Call',
+      day: '18',
+      month: 'May',
+    },
+    {
+      id: 7,
+      time: '12:00pm - 2:00pm',
+      callType: 'Regular Call',
+      day: '30',
+      month: 'May',
+    },
+  ]
+  const [loggedIn, setLoggedIn] = useState(false)
+  const [screen, setScreen] = useState(null)
 
-  onAuthStateChanged(auth, (user) => {
+  const callbackSetScreen = (screenName: React.SetStateAction<null>) =>
+    setScreen(screenName)
+
+  onAuthStateChanged(auth, user => {
     if (user) {
-      setLoggedIn(true);
+      setLoggedIn(true)
     } else {
-      setLoggedIn(false);
+      setLoggedIn(false)
     }
-  });
+  })
 
-const logout = async () => {
-    console.log("Logout");
+  const logout = async () => {
+    console.log('Logout')
     try {
-        await signOut(auth);
-      } catch (e) {
-          console.error(e);
-        }
+      await signOut(auth)
+    } catch (e) {
+      console.error(e)
+    }
   }
 
-  console.log("Screen:", screen);
-const getScreen = () => {
+  console.log('Screen:', screen)
+  const getScreen = () => {
     if (loggedIn) {
-      return (
-          <Schedule DATA={DATA} setScreen={callbackSetScreen} />
-      )
-     };
-    if (screen === SIGNUP) return <Signup setScreen={callbackSetScreen} />;
-    if (screen === RESETPASSWORD) return <ResetPassword setScreen={callbackSetScreen} />;
-      return (
-          <LoginScreen setScreen={callbackSetScreen}/>
-      );
-  };
+      return <Schedule DATA={DATA} setScreen={callbackSetScreen} />
+    }
+    if (screen === SCREEN.SIGNUP) return <Signup setScreen={callbackSetScreen} />
+    if (screen === SCREEN.RESETPASSWORD)
+      return <ResetPassword setScreen={callbackSetScreen} />
+    return <LoginScreen setScreen={callbackSetScreen} />
+  }
 
   return (
-          <SafeAreaView style={styles.safeArea}>
-            <Button title="Log out" onPress={logout} />
-            {getScreen()}
-          </SafeAreaView>
-  );
+    <SafeAreaView style={styles.safeArea}>
+      <Button title='Log out' onPress={logout} />
+      {getScreen()}
+    </SafeAreaView>
+  )
 }
 
 const styles = StyleSheet.create({
@@ -160,6 +155,6 @@ const styles = StyleSheet.create({
     paddingHorizontal: 12,
     marginBottom: 16,
   },
-});
+})
 
-export default App;
+export default App
