@@ -2,7 +2,7 @@ import React from 'react'
 import {Alert, StyleSheet, Text, TouchableOpacity, View} from 'react-native'
 import type {Card} from './App'
 
-const Home: React.FC<Card> = ({time, callType, day, month}) => {
+const Home: React.FC<Card> = ({time, callType, day, month, onCallName}) => {
   const handleCardPress = () => {
     Alert.alert(
       'Swap this call?',
@@ -30,6 +30,7 @@ const Home: React.FC<Card> = ({time, callType, day, month}) => {
           <View style={styles.shift}>
             <Text style={styles.shiftText}>{callType}</Text>
             <Text style={styles.shiftTime}>{time}</Text>
+            <Text style={styles.shiftTime}>{onCallName}</Text>
           </View>
         </TouchableOpacity>
       </View>

@@ -7,13 +7,15 @@
 
 import {onAuthStateChanged, signOut} from 'firebase/auth'
 import {auth} from './src/firebase'
-import React, {useState} from 'react'
+import React, {useEffect, useState} from 'react'
 import {SafeAreaView, Button, StyleSheet} from 'react-native'
 
 import LoginScreen from './src/login/LoginScreen'
 import Schedule from './Schedule'
 import Signup from './src/login/Signup'
 import ResetPassword from './src/login/ResetPassword'
+import {firebaseDB} from './src/firebase'
+import {ref, onValue, push, update, remove} from 'firebase/database'
 
 export interface Card {
   id: number
@@ -21,6 +23,7 @@ export interface Card {
   callType: string
   day: string
   month: string
+  onCallName: string
 }
 
 export enum SCREEN {
@@ -29,8 +32,15 @@ export enum SCREEN {
   RESETPASSWORD = 'reset-password',
 }
 
+export interface UserItem {
+  class: string
+  email: string
+  firstName: string
+  lastName: string
+}
+
 function App(): JSX.Element {
-  const DATA: Card[] = [
+  let DATA: any = [
     {
       id: 1,
       time: '10:00pm - 7:00am',
@@ -83,9 +93,13 @@ function App(): JSX.Element {
   ]
   const [loggedIn, setLoggedIn] = useState(false)
   const [screen, setScreen] = useState(null)
+  const [user, setuser] = useState<UserItem | null>(null)
 
   const callbackSetScreen = (screenName: React.SetStateAction<null>) =>
     setScreen(screenName)
+
+  // const callbackSetSched = (sched: React.SetStateAction<null>) =>
+  //   setSched(sched)
 
   onAuthStateChanged(auth, user => {
     if (user) {
@@ -104,12 +118,64 @@ function App(): JSX.Element {
     }
   }
 
-  console.log('Screen:', screen)
+  let uid = auth.currentUser?.uid
+
+  useEffect(() => {
+    const dataFromSnapshot = {} as UserItem
+
+    return onValue(ref(firebaseDB, '/users/' + uid), snapshot => {
+      for (let key in snapshot.val()) {
+        // console.log(key + ':', snapshot.val()[key])
+        let item = snapshot.val()[key]
+        // console.log("snap:", item.class)
+        dataFromSnapshot.class = item.class
+        dataFromSnapshot.email = item.email
+        dataFromSnapshot.firstName = item.firstname
+        dataFromSnapshot.lastName = item.lastname
+      }
+      setuser(dataFromSnapshot)
+    })
+  }, [loggedIn])
+
+  // console.log('Screen:', screen)
+  // console.log('Sched:', sched)
+  // console.log('uid:', uid)
+  //   const getMonthName = (monthNumber: string) => {
+  //   const date = new Date();
+  //   date.setMonth(parseInt(monthNumber) - 1);
+  //
+  //   return date.toLocaleString('en-US', { month: 'long' });
+  // }
+  // let filteredSched: any= []
+  // if (sched && uid){
+  //     for(let key in sched) {
+  //       console.log(key + ":", sched[key]);
+  //       let item = sched[key]
+  //       if (item.onCall == uid) {
+  //         let date = (item.date).split('/')
+  //         console.log(getMonthName(date[0]))
+  //         filteredSched.push(
+  //           {
+  //             callType: item.callType,
+  //             day: date[1],
+  //             month: getMonthName(date[0]),
+  //             time: item.time,
+  //             id: key
+  //             // onCall: item.onCall
+  //           }
+  //         )
+  //       }
+  //     }
+  //     DATA = filteredSched
+  // }
+  console.log(user);
+
   const getScreen = () => {
-    if (loggedIn) {
-      return <Schedule DATA={DATA} setScreen={callbackSetScreen} />
+    if (loggedIn && user) {
+      return <Schedule DATA={DATA} user={user.firstName + " " + user.lastName} setScreen={callbackSetScreen} />
     }
-    if (screen === SCREEN.SIGNUP) return <Signup setScreen={callbackSetScreen} />
+    if (screen === SCREEN.SIGNUP)
+      return <Signup setScreen={callbackSetScreen} />
     if (screen === SCREEN.RESETPASSWORD)
       return <ResetPassword setScreen={callbackSetScreen} />
     return <LoginScreen setScreen={callbackSetScreen} />
